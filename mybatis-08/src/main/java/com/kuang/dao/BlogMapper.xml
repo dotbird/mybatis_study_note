@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuang.dao.BlogMapper">
+
+    <insert id="addBook" parameterType="blog">
+        insert into mybatis.blog (id,title,author,create_time,views)
+        values (#{id},#{title},#{author},#{createTime},#{views});
+    </insert>
+
+    <!-- sql 语句  将一些功能的部分抽取出来，方便复用-->
+    <sql id="if-title-author">
+        <if test="title != null">
+            title = #{title}
+        </if>
+        <if test="author != null">
+            and author = #{author}
+        </if>
+    </sql>
+
+
+    <!--原始的if语句-->
+    <select id="queryBlogIF2" parameterType="map" resultType="blog">
+        select * from mybatis.blog where 1=1
+        <if test="title != null">
+            and title = #{title}
+        </if>
+        <if test="author != null">
+            and author = #{author}
+        </if>
+    </select>
+
+    <!--加了‘where’的if语句（没了“1=1”和第一个“and”）-->
+    <select id="queryBlogIF" parameterType="map" resultType="blog">
+        select * from mybatis.blog
+        <where>
+            <!--上面提取的SQL，在需要使用的地方使用Include标签引用-->
+            <include refid="if-title-author"></include>
+            <!--<if test="title != null">-->
+                <!--title = #{title}-->
+            <!--</if>-->
+            <!--<if test="author != null">-->
+                <!--and author = #{author}-->
+            <!--</if>-->
+        </where>
+    </select>
+
+    <!--‘choose’语句，选择其中一个条件执行，按顺序选择（1不行就2,2不行就3）-->
+    <select id="queryBlogChoose" parameterType="map" resultType="Blog">
+        select * from mybatis.blog
+        <where>
+            <choose>
+                <when test="title != null">
+                    title = #{title}
+                </when>
+                <when test="author != null">
+                    and author = #{author}
+                </when>
+                <otherwise>
+                    and views = #{views}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--‘set’语句，set和去除原本SQL语句的逗号-->
+    <update id="updateBlog" parameterType="map">
+        update mybatis.blog
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="author != null">
+                and author = #{author}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--  select * from mybatis.bolg where 1=1 and (id=1 or id=2 or id=3)
+        传递一个万能的map，这个map中可以存在一个集合！
+    -->
+    <select id="queryBlogForeach" parameterType="map" resultType="blog">
+        select * from mybatis.blog;
+        <where>
+            <!-- 下面的 open = " ("，记得加空格-->
+            <foreach collection="ids" item="id" open=" (" close=")" separator="or">
+                id = #{id}
+            </foreach>
+        </where>
+    </select>
+
+
+
+
+
+
+
+
+</mapper>

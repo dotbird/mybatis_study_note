@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--引用外部配置文件    里面也可以设置属性-->
+    <properties resource="db.properties">
+        <property name="pwd" value="d05178072"/>
+    </properties>
+
+    <!--可以给实体类起别名-->
+    <typeAliases>
+        <!--方式一-->
+        <!--<typeAlias type="com.kuang.pojo.User" alias="User"/>-->
+        <!--方式二-->
+        <package name="com.kuang.pojo"/>
+        <!--方式三：使用注解，User类-->
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <!--<property name="url" value="jdbc:mysql://localhost:3306/mybatis?useSSL=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=GMT%2B8"/>-->
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${pwd}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--每一个Mapper.xml都需要在mybatis核心配置文件中注册-->
+    <mappers>
+        <mapper resource="com/kuang/dao/UserMapper.xml"/>
+        <!--  推荐使用第一种，
+              使用二三时：接口和他的Mapper配置文件必须同名
+                          接口和他的Mapper配置文件必须在同一个包下
+        -->
+        <!--<mapper class="com.kuang.dao.UserMapper"/>-->
+        <!--<package name="com.kuang.dao"/>-->
+    </mappers>
+
+</configuration>
